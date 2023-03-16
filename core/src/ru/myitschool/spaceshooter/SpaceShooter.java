@@ -57,17 +57,17 @@ public class SpaceShooter extends Game {
 	}
 
 	void createFont(){
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("mr_countryhouse.ttf"));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("spaceagecyrillic_regular.ttf"));
 		//FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("comic.ttf"));
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		parameter.characters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 		parameter.size = 50;
-		parameter.color = Color.CHARTREUSE;
+		parameter.color = Color.valueOf("FFD700");
 		parameter.borderWidth = 2;
-		parameter.borderColor = Color.BLACK;
+		parameter.borderColor = Color.valueOf("A00000");
 		font = generator.generateFont(parameter);
 
-		parameter.size = 70;
+		parameter.size = 50;
 		fontLarge = generator.generateFont(parameter);
 
 		generator.dispose();

@@ -1,12 +1,25 @@
 package ru.myitschool.spaceshooter;
 
+import static ru.myitschool.spaceshooter.SpaceShooter.SCR_HEIGHT;
+import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 
 public class ScreenIntro implements Screen {
     SpaceShooter s;
+    Texture imgBackGround; // фон
+    SpaceButton btnGame, btnSettings, btnAbout, btnExit;
 
     public ScreenIntro(SpaceShooter spaceShooter) {
         s = spaceShooter;
+        imgBackGround = new Texture("space00.jpg");
+        // создаём кнопки
+        btnGame = new SpaceButton(s.fontLarge, "PLAY", 50, 450);
+        btnSettings = new SpaceButton(s.fontLarge, "SETTINGS", 50, 350);
+        btnAbout = new SpaceButton(s.fontLarge, "ABOUT", 50, 250);
+        btnExit = new SpaceButton(s.fontLarge, "EXIT", 50, 150);
     }
 
     @Override
@@ -16,7 +29,37 @@ public class ScreenIntro implements Screen {
 
     @Override
     public void render(float delta) {
+        // касания экрана/клики мышью
+        if(Gdx.input.justTouched()) {
+            s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            s.camera.unproject(s.touch);
+            if(btnGame.hit(s.touch.x, s.touch.y)){
+                s.setScreen(s.screenGame);
+            }
+            if(btnSettings.hit(s.touch.x, s.touch.y)){
+                s.setScreen(s.screenSettings);
+            }
+            if(btnAbout.hit(s.touch.x, s.touch.y)){
+                s.setScreen(s.screenAbout);
+            }
+            if(btnExit.hit(s.touch.x, s.touch.y)){
+                Gdx.app.exit();
+            }
+        }
 
+        // события игры
+        // ------------
+
+        // отрисовка всего
+        s.camera.update();
+        s.batch.setProjectionMatrix(s.camera.combined);
+        s.batch.begin();
+        s.batch.draw(imgBackGround, 0, 0, SCR_WIDTH, SCR_HEIGHT);
+        btnGame.font.draw(s.batch, btnGame.text, btnGame.x, btnGame.y);
+        btnSettings.font.draw(s.batch, btnSettings.text, btnSettings.x, btnSettings.y);
+        btnAbout.font.draw(s.batch, btnAbout.text, btnAbout.x, btnAbout.y);
+        btnExit.font.draw(s.batch, btnExit.text, btnExit.x, btnExit.y);
+        s.batch.end();
     }
 
     @Override
@@ -41,6 +84,6 @@ public class ScreenIntro implements Screen {
 
     @Override
     public void dispose() {
-
+        imgBackGround.dispose();
     }
 }
