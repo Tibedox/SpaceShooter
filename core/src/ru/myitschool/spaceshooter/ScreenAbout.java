@@ -1,12 +1,32 @@
 package ru.myitschool.spaceshooter;
 
+import static ru.myitschool.spaceshooter.SpaceShooter.SCR_HEIGHT;
+import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
+
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 
 public class ScreenAbout implements Screen {
     SpaceShooter s;
+    Texture imgBackGround; // фон
+    SpaceButton btnBack;
+
+    String textAbout =
+            "Игра Space Shooter\n" +
+            "создана в рамках\n" +
+            "проекта Mobile Game\n" +
+            "Development на Java\n" +
+            "с использованием\n" +
+            "фреймворка LibGDX.\n\n" +
+            "Цель игры: отбивать\n" +
+            "атаки пришельцев.";
 
     public ScreenAbout(SpaceShooter spaceShooter) {
         s = spaceShooter;
+        imgBackGround = new Texture("space02.jpg");
+        // создаём кнопки
+        btnBack = new SpaceButton(s.fontLarge, "BACK", 200, 150);
     }
 
     @Override
@@ -16,7 +36,27 @@ public class ScreenAbout implements Screen {
 
     @Override
     public void render(float delta) {
+        // касания экрана/клики мышью
+        if(Gdx.input.justTouched()) {
+            s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            s.camera.unproject(s.touch);
 
+            if(btnBack.hit(s.touch.x, s.touch.y)){
+                s.setScreen(s.screenIntro);
+            }
+        }
+
+        // события игры
+        // ------------
+
+        // отрисовка всего
+        s.camera.update();
+        s.batch.setProjectionMatrix(s.camera.combined);
+        s.batch.begin();
+        s.batch.draw(imgBackGround, 0, 0, SCR_WIDTH, SCR_HEIGHT);
+        s.font.draw(s.batch, textAbout, 50, 650);
+        btnBack.font.draw(s.batch, btnBack.text, btnBack.x, btnBack.y);
+        s.batch.end();
     }
 
     @Override
@@ -41,6 +81,6 @@ public class ScreenAbout implements Screen {
 
     @Override
     public void dispose() {
-
+        imgBackGround.dispose();
     }
 }
