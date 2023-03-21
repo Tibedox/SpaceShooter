@@ -12,8 +12,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class InputKeyboard {
-    private final String fontName = "mr_countryhouse.ttf";
+    private final String fontName = "spaceagecyrillic_regular.ttf";
     private final String imageKeys = "keys.png";
+    private final int fontSize = 20;
 
     private boolean endOfEdit;
 
@@ -218,7 +219,7 @@ public class InputKeyboard {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(fontName));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.color = new Color(1, 1, 1, 1);
-        parameter.size = 50;
+        parameter.size = fontSize;
         parameter.borderColor = Color.BLACK;
         parameter.borderWidth = 1;
         parameter.borderStraight = true;

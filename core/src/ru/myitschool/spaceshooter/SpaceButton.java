@@ -38,4 +38,10 @@ public class SpaceButton {
         else
             return x < tx && tx < x + width && y < ty && ty < y + height;
     }
+
+    public void setText(String text) {
+        this.text = text;
+        GlyphLayout gl = new GlyphLayout(font, text);
+        width = gl.width;
+    }
 }

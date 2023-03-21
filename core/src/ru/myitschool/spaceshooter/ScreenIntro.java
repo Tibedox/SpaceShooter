@@ -34,7 +34,7 @@ public class ScreenIntro implements Screen {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
             if(btnGame.hit(s.touch.x, s.touch.y)){
-                s.setScreen(s.screenGame);
+                //s.setScreen(s.screenGame);
             }
             if(btnSettings.hit(s.touch.x, s.touch.y)){
                 s.setScreen(s.screenSettings);
