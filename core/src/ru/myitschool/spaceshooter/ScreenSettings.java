@@ -49,6 +49,8 @@ public class ScreenSettings implements Screen {
             if(isEnterName) {
                 if(keyboard.endOfEdit(s.touch.x, s.touch.y)){
                     isEnterName = false;
+                    s.playerName = keyboard.getText();
+                    btnName.setText("Name: "+s.playerName);
                 }
             } else {
                 if (btnName.hit(s.touch.x, s.touch.y)) {
@@ -138,5 +140,13 @@ public class ScreenSettings implements Screen {
             s.modeOfGame = MODE_EASY;
             btnMode.setText("Mode: Easy");
         }
+    }
+
+    void saveSettings() {
+
+    }
+
+    void loadSettings() {
+
     }
 }

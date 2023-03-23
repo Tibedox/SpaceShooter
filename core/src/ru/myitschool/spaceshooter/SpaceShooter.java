@@ -27,6 +27,7 @@ public class SpaceShooter extends Game {
 	boolean musicOn = true;
 	public static final int MODE_EASY = 0, MODE_NORMAL = 1, MODE_HARD = 2;
 	int modeOfGame = MODE_EASY; // сложность игры
+	String playerName = "Noname";
 	
 	@Override
 	public void create () {
