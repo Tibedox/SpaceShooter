@@ -3,6 +3,7 @@ package ru.myitschool.spaceshooter;
 import static ru.myitschool.spaceshooter.SpaceShooter.*;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -33,6 +34,8 @@ public class ScreenSettings implements Screen {
         btnMusic = new SpaceButton(s.fontMedium, "Music: ON", 50, 450);
         btnClearRecords = new SpaceButton(s.fontMedium, "Clear Records", 50, 400);
         btnBack = new SpaceButton(s.fontMedium, "Back", 50, 150);
+
+        loadSettings();
     }
 
     @Override
@@ -50,7 +53,7 @@ public class ScreenSettings implements Screen {
                 if(keyboard.endOfEdit(s.touch.x, s.touch.y)){
                     isEnterName = false;
                     s.playerName = keyboard.getText();
-                    btnName.setText("Name: "+s.playerName);
+                    updateButtons();
                 }
             } else {
                 if (btnName.hit(s.touch.x, s.touch.y)) {
@@ -60,25 +63,25 @@ public class ScreenSettings implements Screen {
                     changeMode();
                 }
                 if (btnSound.hit(s.touch.x, s.touch.y)) {
-                    s.soundOn = !s.soundOn;
-                    if (s.soundOn) btnSound.setText("Sound: ON");
-                    else btnSound.setText("Sound: OFF");
+                    s.sound = !s.sound;
+                    updateButtons();
                 }
                 if (btnMusic.hit(s.touch.x, s.touch.y)) {
-                    s.musicOn = !s.musicOn;
-                    if (s.musicOn) {
-                        btnMusic.setText("Music: ON");
-                        //s.screenGame.sndMusic.play();
+                    s.music = !s.music;
+                    updateButtons();
+                    /*if (s.music) {
+                        s.screenGame.sndMusic.play();
                     } else {
-                        btnMusic.setText("Music: OFF");
-                        //s.screenGame.sndMusic.stop();
-                    }
+                        s.screenGame.sndMusic.stop();
+                    }*/
                 }
                 if (btnClearRecords.hit(s.touch.x, s.touch.y)) {
                     btnClearRecords.setText("Records Pured");
                 }
                 if (btnBack.hit(s.touch.x, s.touch.y)) {
                     s.setScreen(s.screenIntro);
+                    saveSettings();
+                    btnClearRecords.setText("Clear Records");
                 }
             }
         }
@@ -120,7 +123,7 @@ public class ScreenSettings implements Screen {
 
     @Override
     public void hide() {
-        btnClearRecords.setText("Clear Records");
+
     }
 
     @Override
@@ -132,21 +135,45 @@ public class ScreenSettings implements Screen {
     void changeMode(){
         if(s.modeOfGame == MODE_EASY){
             s.modeOfGame = MODE_NORMAL;
-            btnMode.setText("Mode: Normal");
         } else if(s.modeOfGame == MODE_NORMAL){
             s.modeOfGame = MODE_HARD;
-            btnMode.setText("Mode: Hard");
         } else if(s.modeOfGame == MODE_HARD){
             s.modeOfGame = MODE_EASY;
-            btnMode.setText("Mode: Easy");
         }
+        updateButtons();
     }
 
     void saveSettings() {
-
+        Preferences prefs = Gdx.app.getPreferences("SpaceShooterSettings");
+        prefs.putString("Name", s.playerName);
+        prefs.putInteger("Mode", s.modeOfGame);
+        prefs.putBoolean("Sound", s.sound);
+        prefs.putBoolean("Music", s.music);
+        prefs.flush();
     }
 
     void loadSettings() {
+        Preferences prefs = Gdx.app.getPreferences("SpaceShooterSettings");
+        if(prefs.contains("Name")) s.playerName = prefs.getString("Name");
+        if(prefs.contains("Mode")) s.modeOfGame = prefs.getInteger("Mode");
+        if(prefs.contains("Sound")) s.sound = prefs.getBoolean("Sound");
+        if(prefs.contains("Music")) s.music = prefs.getBoolean("Music");
+        updateButtons();
+    }
 
+    void updateButtons() {
+        btnName.setText("Name: "+s.playerName);
+
+        if (s.modeOfGame == MODE_EASY) btnMode.setText("Mode: Easy");
+        if (s.modeOfGame == MODE_NORMAL) btnMode.setText("Mode: Normal");
+        if (s.modeOfGame == MODE_HARD) btnMode.setText("Mode: Hard");
+
+        btnSound.setText( s.sound ? "Sound: ON" : "Sound: OFF");
+        /*if (s.sound) btnSound.setText("Sound: ON");
+        else btnSound.setText("Sound: OFF");*/
+
+        btnMusic.setText( s.music ? "Music: ON" : "Music: OFF");
+        /*if (s.music) btnMusic.setText("Music: ON");
+        else  btnMusic.setText("Music: OFF");*/
     }
 }
