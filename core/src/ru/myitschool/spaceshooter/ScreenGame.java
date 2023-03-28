@@ -39,7 +39,6 @@ public class ScreenGame implements Screen {
         // события игры
         for (int i = 0; i < skies.length; i++) {
             skies[i].move();
-            skies[i].outOfScreen();
         }
 
         // отрисовка всего

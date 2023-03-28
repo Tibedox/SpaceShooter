@@ -9,6 +9,12 @@ public class Sky extends SpaceObject{
         vy = -1;
     }
 
+    @Override
+    void move() {
+        super.move();
+        outOfScreen();
+    }
+
     void outOfScreen() {
         if(y < -SCR_HEIGHT) {
             y = SCR_HEIGHT;
