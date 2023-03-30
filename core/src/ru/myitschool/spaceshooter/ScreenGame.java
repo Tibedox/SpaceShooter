@@ -34,15 +34,10 @@ public class ScreenGame implements Screen {
     @Override
     public void render(float delta) {
         // касания экрана/клики мышью
-        if(Gdx.input.justTouched()) {
+        if(Gdx.input.isTouched()) {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
-            if(s.touch.x > ship.x) {
-                ship.vx = 10;
-            }
-            if(s.touch.x < ship.x) {
-                ship.vx = -10;
-            }
+            ship.vx = (s.touch.x - ship.x)/50;
         }
 
         // события игры
