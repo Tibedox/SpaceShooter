@@ -10,16 +10,20 @@ import com.badlogic.gdx.graphics.Texture;
 public class ScreenGame implements Screen {
     SpaceShooter s;
     Texture imgSky;
+    Texture imgShip;
 
     Sky[] skies = new Sky[2];
+    SpaceShip ship;
 
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
 
         imgSky = new Texture("stars.png");
+        imgShip = new Texture("ship.png");
 
         skies[0] = new Sky(0);
         skies[1] = new Sky(SCR_HEIGHT);
+        ship = new SpaceShip(SCR_WIDTH/2, 100, 100, 100);
     }
 
     @Override
@@ -48,6 +52,7 @@ public class ScreenGame implements Screen {
         for (int i = 0; i < skies.length; i++) {
             s.batch.draw(imgSky, skies[i].x, skies[i].y, skies[i].width, skies[i].height);
         }
+        s.batch.draw(imgShip, ship.getX(), ship.getY(), ship.width, ship.height);
         s.batch.end();
     }
 
@@ -73,6 +78,7 @@ public class ScreenGame implements Screen {
 
     @Override
     public void dispose() {
-
+        imgSky.dispose();
+        imgShip.dispose();
     }
 }

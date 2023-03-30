@@ -16,4 +16,12 @@ public class SpaceObject {
         x += vx;
         y += vy;
     }
+
+    float getX() {
+        return x-width/2;
+    }
+
+    float getY() {
+        return y-height/2;
+    }
 }
