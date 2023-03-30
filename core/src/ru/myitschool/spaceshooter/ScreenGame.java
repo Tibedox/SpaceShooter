@@ -37,13 +37,19 @@ public class ScreenGame implements Screen {
         if(Gdx.input.justTouched()) {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
-
+            if(s.touch.x > ship.x) {
+                ship.vx = 10;
+            }
+            if(s.touch.x < ship.x) {
+                ship.vx = -10;
+            }
         }
 
         // события игры
         for (int i = 0; i < skies.length; i++) {
             skies[i].move();
         }
+        ship.move();
 
         // отрисовка всего
         s.camera.update();
