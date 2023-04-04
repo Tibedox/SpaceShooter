@@ -4,11 +4,13 @@ import static ru.myitschool.spaceshooter.SpaceShooter.SCR_HEIGHT;
 import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 
 public class ScreenGame implements Screen {
     SpaceShooter s;
+    boolean isAccelerometerPresent;
     Texture imgSky;
     Texture imgShip;
 
@@ -17,6 +19,7 @@ public class ScreenGame implements Screen {
 
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
+        isAccelerometerPresent = Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
 
         imgSky = new Texture("stars.png");
         imgShip = new Texture("ship.png");
@@ -38,6 +41,8 @@ public class ScreenGame implements Screen {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
             ship.vx = (s.touch.x - ship.x)/50;
+        } else if(isAccelerometerPresent) {
+            ship.vx = -Gdx.input.getAccelerometerX()*10;
         }
 
         // события игры
