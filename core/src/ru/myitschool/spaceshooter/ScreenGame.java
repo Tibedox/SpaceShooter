@@ -19,6 +19,7 @@ public class ScreenGame implements Screen {
 
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
+        // проверяем наличие акселерометра в устройстве
         isAccelerometerPresent = Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
 
         imgSky = new Texture("stars.png");
@@ -41,8 +42,8 @@ public class ScreenGame implements Screen {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
             ship.vx = (s.touch.x - ship.x)/50;
-        } else if(isAccelerometerPresent) {
-            ship.vx = -Gdx.input.getAccelerometerX()*10;
+        } else if(isAccelerometerPresent) { // проверяем наклон акселерометра
+            ship.vx = -Gdx.input.getAccelerometerX()*2;
         }
 
         // события игры
