@@ -17,12 +17,15 @@ public class ScreenGame implements Screen {
     Texture imgSky;
     Texture imgShip;
     Texture imgEnemy;
+    Texture imgShot;
 
     Sky[] skies = new Sky[2];
     ArrayList<EnemyShip> enemy = new ArrayList<>();
+    ArrayList<ShipShot> shots = new ArrayList<>();
     SpaceShip ship;
 
     long timeEnemySpawn, timeEnemyInterval = 1500;
+    long timeShotSpawn, timeShotInterval = 600;
 
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
@@ -32,13 +35,11 @@ public class ScreenGame implements Screen {
         imgSky = new Texture("stars.png");
         imgShip = new Texture("ship.png");
         imgEnemy = new Texture("enemy.png");
+        imgShot = new Texture("shipshot.png");
 
         skies[0] = new Sky(0);
         skies[1] = new Sky(SCR_HEIGHT);
         ship = new SpaceShip(SCR_WIDTH/2, 100, 100, 100);
-
-        enemy.add(new EnemyShip(100, 100));
-        timeEnemySpawn = TimeUtils.millis();
     }
 
     @Override
@@ -61,13 +62,17 @@ public class ScreenGame implements Screen {
         for (int i = 0; i < skies.length; i++) {
             skies[i].move();
         }
-        if(TimeUtils.millis() > timeEnemySpawn+timeEnemyInterval) {
-            enemy.add(new EnemyShip(100, 100));
-            timeEnemySpawn = TimeUtils.millis();
-        }
+
+        spawnEnemy();
         for (int i = 0; i < enemy.size(); i++) {
             enemy.get(i).move();
         }
+
+        spawnShot();
+        for (int i = 0; i < shots.size(); i++) {
+            shots.get(i).move();
+        }
+
         ship.move();
 
         // отрисовка всего
@@ -79,6 +84,9 @@ public class ScreenGame implements Screen {
         }
         for (int i = 0; i < enemy.size(); i++) {
             s.batch.draw(imgEnemy, enemy.get(i).getX(), enemy.get(i).getY(), enemy.get(i).width, enemy.get(i).height);
+        }
+        for (int i = 0; i < shots.size(); i++) {
+            s.batch.draw(imgShot, shots.get(i).getX(), shots.get(i).getY(), shots.get(i).width, shots.get(i).height);
         }
         s.batch.draw(imgShip, ship.getX(), ship.getY(), ship.width, ship.height);
         s.batch.end();
@@ -109,5 +117,20 @@ public class ScreenGame implements Screen {
         imgSky.dispose();
         imgShip.dispose();
         imgEnemy.dispose();
+        imgShot.dispose();
+    }
+
+    void spawnEnemy() {
+        if(TimeUtils.millis() > timeEnemySpawn+timeEnemyInterval) {
+            enemy.add(new EnemyShip(100, 100));
+            timeEnemySpawn = TimeUtils.millis();
+        }
+    }
+
+    void spawnShot() {
+        if(TimeUtils.millis() > timeShotSpawn+timeShotInterval) {
+            shots.add(new ShipShot(ship.x, ship.y, ship.width, ship.height));
+            timeShotSpawn = TimeUtils.millis();
+        }
     }
 }
