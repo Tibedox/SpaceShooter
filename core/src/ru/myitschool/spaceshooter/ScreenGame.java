@@ -6,6 +6,7 @@ import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -14,10 +15,13 @@ import java.util.ArrayList;
 public class ScreenGame implements Screen {
     SpaceShooter s;
     boolean isAccelerometerPresent;
+
     Texture imgSky;
     Texture imgShip;
     Texture imgEnemy;
     Texture imgShot;
+    Sound sndShoot;
+    Sound sndExplosion;
 
     Sky[] skies = new Sky[2];
     ArrayList<EnemyShip> enemy = new ArrayList<>();
@@ -36,6 +40,8 @@ public class ScreenGame implements Screen {
         imgShip = new Texture("ship.png");
         imgEnemy = new Texture("enemy.png");
         imgShot = new Texture("shipshot.png");
+        sndShoot = Gdx.audio.newSound(Gdx.files.internal("blaster.mp3"));
+        sndExplosion = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
 
         skies[0] = new Sky(0);
         skies[1] = new Sky(SCR_HEIGHT);
@@ -66,15 +72,25 @@ public class ScreenGame implements Screen {
         spawnEnemy();
         for (int i = 0; i < enemy.size(); i++) {
             enemy.get(i).move();
+            if(enemy.get(i).outOfScreen()) {
+                enemy.remove(i);
+                i--;
+            }
         }
 
         spawnShot();
         for (int i = 0; i < shots.size(); i++) {
             shots.get(i).move();
+            if(shots.get(i).outOfScreen()) {
+                shots.remove(i);
+                i--;
+                continue;
+            }
             for (int j = 0; j < enemy.size(); j++) {
                 if(shots.get(i).overlap(enemy.get(j))) {
                     enemy.remove(j);
                     shots.remove(i);
+                    if(s.sound) sndExplosion.play();
                     break;
                 }
             }
@@ -138,6 +154,7 @@ public class ScreenGame implements Screen {
         if(TimeUtils.millis() > timeShotSpawn+timeShotInterval) {
             shots.add(new ShipShot(ship.x, ship.y, ship.width, ship.height));
             timeShotSpawn = TimeUtils.millis();
+            if(s.sound) sndShoot.play();
         }
     }
 }
