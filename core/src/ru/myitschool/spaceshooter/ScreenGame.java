@@ -20,12 +20,14 @@ public class ScreenGame implements Screen {
     Texture imgShip;
     Texture imgEnemy;
     Texture imgShot;
+    Texture imgFragment;
     Sound sndShoot;
     Sound sndExplosion;
 
     Sky[] skies = new Sky[2];
     ArrayList<EnemyShip> enemy = new ArrayList<>();
     ArrayList<ShipShot> shots = new ArrayList<>();
+    ArrayList<Fragment> fragments = new ArrayList<>();
     SpaceShip ship;
 
     long timeEnemySpawn, timeEnemyInterval = 1500;
@@ -40,6 +42,7 @@ public class ScreenGame implements Screen {
         imgShip = new Texture("ship.png");
         imgEnemy = new Texture("enemy.png");
         imgShot = new Texture("shipshot.png");
+        imgFragment = new Texture("fragmentenemy.png");
         sndShoot = Gdx.audio.newSound(Gdx.files.internal("blaster.mp3"));
         sndExplosion = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
 
@@ -65,10 +68,12 @@ public class ScreenGame implements Screen {
         }
 
         // события игры
+        // небо
         for (int i = 0; i < skies.length; i++) {
             skies[i].move();
         }
 
+        // вражеские корабли
         spawnEnemy();
         for (int i = 0; i < enemy.size(); i++) {
             enemy.get(i).move();
@@ -78,6 +83,7 @@ public class ScreenGame implements Screen {
             }
         }
 
+        // наши выстрелы
         spawnShot();
         for (int i = 0; i < shots.size(); i++) {
             shots.get(i).move();
@@ -86,16 +92,31 @@ public class ScreenGame implements Screen {
                 i--;
                 continue;
             }
+            // попадание выстрела в вражеский корабль
             for (int j = 0; j < enemy.size(); j++) {
                 if(shots.get(i).overlap(enemy.get(j))) {
+                    for (int k = 0; k < 3333; k++) {
+                        fragments.add(new Fragment(enemy.get(j).x, enemy.get(j).y, enemy.get(j).width));
+                    }
                     enemy.remove(j);
                     shots.remove(i);
+                    i--;
                     if(s.sound) sndExplosion.play();
                     break;
                 }
             }
         }
 
+        // обломки
+        for (int i = 0; i < fragments.size(); i++) {
+            fragments.get(i).move();
+            if(fragments.get(i).outOfScreen()) {
+                fragments.remove(i);
+                i--;
+            }
+        }
+
+        // наш космический корабль
         ship.move();
 
         // отрисовка всего
@@ -104,6 +125,9 @@ public class ScreenGame implements Screen {
         s.batch.begin();
         for (int i = 0; i < skies.length; i++) {
             s.batch.draw(imgSky, skies[i].x, skies[i].y, skies[i].width, skies[i].height);
+        }
+        for (int i = 0; i < fragments.size(); i++) {
+            s.batch.draw(imgFragment, fragments.get(i).getX(), fragments.get(i).getY(), fragments.get(i).width, fragments.get(i).height);
         }
         for (int i = 0; i < enemy.size(); i++) {
             s.batch.draw(imgEnemy, enemy.get(i).getX(), enemy.get(i).getY(), enemy.get(i).width, enemy.get(i).height);
@@ -141,6 +165,7 @@ public class ScreenGame implements Screen {
         imgShip.dispose();
         imgEnemy.dispose();
         imgShot.dispose();
+        imgFragment.dispose();
     }
 
     void spawnEnemy() {
