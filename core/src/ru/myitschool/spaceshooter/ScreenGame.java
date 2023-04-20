@@ -8,6 +8,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -20,7 +22,8 @@ public class ScreenGame implements Screen {
     Texture imgShip;
     Texture imgEnemy;
     Texture imgShot;
-    Texture imgFragment;
+    Texture imgAtlasFragments;
+    TextureRegion[] imgFragment = new TextureRegion[4];
     Sound sndShoot;
     Sound sndExplosion;
 
@@ -42,7 +45,10 @@ public class ScreenGame implements Screen {
         imgShip = new Texture("ship.png");
         imgEnemy = new Texture("enemy.png");
         imgShot = new Texture("shipshot.png");
-        imgFragment = new Texture("fragmentenemy.png");
+        imgAtlasFragments = new Texture("atlasfragment.png");
+        for (int i = 0; i < imgFragment.length; i++) {
+            imgFragment[i] = new TextureRegion(imgAtlasFragments, i*200, 0, 200, 200);
+        }
         sndShoot = Gdx.audio.newSound(Gdx.files.internal("blaster.mp3"));
         sndExplosion = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
 
@@ -95,7 +101,7 @@ public class ScreenGame implements Screen {
             // попадание выстрела в вражеский корабль
             for (int j = 0; j < enemy.size(); j++) {
                 if(shots.get(i).overlap(enemy.get(j))) {
-                    for (int k = 0; k < 1000; k++) {
+                    for (int k = 0; k < 50; k++) {
                         fragments.add(new Fragment(enemy.get(j).x, enemy.get(j).y, enemy.get(j).width));
                     }
                     enemy.remove(j);
@@ -127,7 +133,7 @@ public class ScreenGame implements Screen {
             s.batch.draw(imgSky, skies[i].x, skies[i].y, skies[i].width, skies[i].height);
         }
         for (int i = 0; i < fragments.size(); i++) {
-            s.batch.draw(imgFragment, fragments.get(i).getX(), fragments.get(i).getY(), fragments.get(i).width, fragments.get(i).height);
+            s.batch.draw(imgFragment[fragments.get(i).type], fragments.get(i).getX(), fragments.get(i).getY(), fragments.get(i).width, fragments.get(i).height);
         }
         for (int i = 0; i < enemy.size(); i++) {
             s.batch.draw(imgEnemy, enemy.get(i).getX(), enemy.get(i).getY(), enemy.get(i).width, enemy.get(i).height);
@@ -165,7 +171,7 @@ public class ScreenGame implements Screen {
         imgShip.dispose();
         imgEnemy.dispose();
         imgShot.dispose();
-        imgFragment.dispose();
+        imgAtlasFragments.dispose();
     }
 
     void spawnEnemy() {
