@@ -95,7 +95,7 @@ public class ScreenGame implements Screen {
             // попадание выстрела в вражеский корабль
             for (int j = 0; j < enemy.size(); j++) {
                 if(shots.get(i).overlap(enemy.get(j))) {
-                    for (int k = 0; k < 3333; k++) {
+                    for (int k = 0; k < 1000; k++) {
                         fragments.add(new Fragment(enemy.get(j).x, enemy.get(j).y, enemy.get(j).width));
                     }
                     enemy.remove(j);
