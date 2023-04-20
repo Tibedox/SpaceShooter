@@ -133,7 +133,11 @@ public class ScreenGame implements Screen {
             s.batch.draw(imgSky, skies[i].x, skies[i].y, skies[i].width, skies[i].height);
         }
         for (int i = 0; i < fragments.size(); i++) {
-            s.batch.draw(imgFragment[fragments.get(i).type], fragments.get(i).getX(), fragments.get(i).getY(), fragments.get(i).width, fragments.get(i).height);
+            s.batch.draw(imgFragment[fragments.get(i).type],
+                    fragments.get(i).getX(), fragments.get(i).getY(),
+                    fragments.get(i).width/2, fragments.get(i).height/2,
+                    fragments.get(i).width, fragments.get(i).height,
+                    1, 1, fragments.get(i).angle);
         }
         for (int i = 0; i < enemy.size(); i++) {
             s.batch.draw(imgEnemy, enemy.get(i).getX(), enemy.get(i).getY(), enemy.get(i).width, enemy.get(i).height);
