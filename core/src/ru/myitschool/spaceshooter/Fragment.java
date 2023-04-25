@@ -14,7 +14,7 @@ public class Fragment extends SpaceObject{
         width = MathUtils.random(size/10, size/3);
         height = MathUtils.random(size/10, size/3);
         float a = MathUtils.random(0f, 360f);
-        float v = MathUtils.random(0.1f, 5f);
+        float v = MathUtils.random(2f, 5f);
         vx = v * MathUtils.sin(a);
         vy = v * MathUtils.cos(a);
         type = MathUtils.random(0, 3);

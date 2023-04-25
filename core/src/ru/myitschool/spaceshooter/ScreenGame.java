@@ -36,6 +36,8 @@ public class ScreenGame implements Screen {
     long timeEnemySpawn, timeEnemyInterval = 1500;
     long timeShotSpawn, timeShotInterval = 600;
 
+    int kills;
+
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
         // проверяем наличие акселерометра в устройстве
@@ -64,7 +66,7 @@ public class ScreenGame implements Screen {
 
     @Override
     public void render(float delta) {
-        // касания экрана/клики мышью
+        // +++++++++++++++ касания экрана/клики мышью ++++++++++++++++++++++++++++++++++++++++++++++
         if(Gdx.input.isTouched()) {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
@@ -73,7 +75,7 @@ public class ScreenGame implements Screen {
             ship.vx = -Gdx.input.getAccelerometerX()*2;
         }
 
-        // события игры
+        // +++++++++++++++ события игры ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         // небо
         for (int i = 0; i < skies.length; i++) {
             skies[i].move();
@@ -106,6 +108,7 @@ public class ScreenGame implements Screen {
                     }
                     enemy.remove(j);
                     shots.remove(i);
+                    kills++;
                     i--;
                     if(s.sound) sndExplosion.play();
                     break;
@@ -125,7 +128,7 @@ public class ScreenGame implements Screen {
         // наш космический корабль
         ship.move();
 
-        // отрисовка всего
+        // +++++++++++++++ отрисовка всего +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         s.camera.update();
         s.batch.setProjectionMatrix(s.camera.combined);
         s.batch.begin();
@@ -146,6 +149,7 @@ public class ScreenGame implements Screen {
             s.batch.draw(imgShot, shots.get(i).getX(), shots.get(i).getY(), shots.get(i).width, shots.get(i).height);
         }
         s.batch.draw(imgShip, ship.getX(), ship.getY(), ship.width, ship.height);
+        s.fontSmall.draw(s.batch, "KILLS: "+kills, 20, SCR_HEIGHT-20);
         s.batch.end();
     }
 

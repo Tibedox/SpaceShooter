@@ -34,6 +34,7 @@ public class ScreenIntro implements Screen {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
             if(btnGame.hit(s.touch.x, s.touch.y)){
+                sleep(100);
                 s.setScreen(s.screenGame);
             }
             if(btnSettings.hit(s.touch.x, s.touch.y)){
@@ -85,5 +86,12 @@ public class ScreenIntro implements Screen {
     @Override
     public void dispose() {
         imgBackGround.dispose();
+    }
+
+    void sleep(long time) {
+        try{
+            Thread.sleep(time);
+        } catch (Exception ignored){
+        }
     }
 }
