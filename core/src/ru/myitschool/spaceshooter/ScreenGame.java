@@ -9,6 +9,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class ScreenGame implements Screen {
     long timeShipDestroy, timeShipAliveInterval = 6000;
 
     int kills;
+    boolean isGameOver;
 
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
@@ -72,6 +74,9 @@ public class ScreenGame implements Screen {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
             ship.vx = (s.touch.x - ship.x)/50;
+            if(isGameOver) {
+                s.setScreen(s.screenIntro);
+            }
         } else if(isAccelerometerPresent) { // проверяем наклон акселерометра
             ship.vx = -Gdx.input.getAccelerometerX()*2;
         }
@@ -135,9 +140,11 @@ public class ScreenGame implements Screen {
         if(ship.isAlive){
             ship.move();
         } else {
-            if(timeShipDestroy+timeShipAliveInterval<TimeUtils.millis()){
-                ship.isAlive = true;
-                ship.x = SCR_WIDTH/2;
+            if(!isGameOver) {
+                if (timeShipDestroy + timeShipAliveInterval < TimeUtils.millis()) {
+                    ship.isAlive = true;
+                    ship.x = SCR_WIDTH / 2;
+                }
             }
         }
 
@@ -164,7 +171,13 @@ public class ScreenGame implements Screen {
         if(ship.isAlive) {
             s.batch.draw(imgShip, ship.getX(), ship.getY(), ship.width, ship.height);
         }
+        for (int i = 0; i < ship.lives; i++) {
+            s.batch.draw(imgShip, SCR_WIDTH-40-40*i, SCR_HEIGHT-40, 30, 30);
+        }
         s.fontSmall.draw(s.batch, "KILLS: "+kills, 20, SCR_HEIGHT-20);
+        if(isGameOver){
+            s.fontLarge.draw(s.batch, "GAME OVER", 0, SCR_HEIGHT/2, SCR_WIDTH, Align.center, false);
+        }
         s.batch.end();
     }
 
@@ -222,6 +235,10 @@ public class ScreenGame implements Screen {
         spawnFragments(ship.x, ship.y, ship.width, 1);
         if(s.sound) sndExplosion.play();
         ship.isAlive = false;
+        ship.lives--;
+        if(ship.lives == 0) {
+            isGameOver = true;
+        }
         timeShipDestroy = TimeUtils.millis();
     }
 }
