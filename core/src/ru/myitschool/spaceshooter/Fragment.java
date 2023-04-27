@@ -6,10 +6,11 @@ import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
 import com.badlogic.gdx.math.MathUtils;
 
 public class Fragment extends SpaceObject{
-    int type;
+    int typeFragment;
+    int typeShip;
     float angle, speedRotation;
 
-    public Fragment(float x, float y, float size) {
+    public Fragment(float x, float y, float size, int type) {
         super(x, y, 0, 0);
         width = MathUtils.random(size/10, size/3);
         height = MathUtils.random(size/10, size/3);
@@ -17,7 +18,8 @@ public class Fragment extends SpaceObject{
         float v = MathUtils.random(2f, 5f);
         vx = v * MathUtils.sin(a);
         vy = v * MathUtils.cos(a);
-        type = MathUtils.random(0, 3);
+        typeShip = type;
+        typeFragment = MathUtils.random(0, 3);
         speedRotation = MathUtils.random(-5f, 5f);
     }
 

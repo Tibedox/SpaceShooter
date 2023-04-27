@@ -9,7 +9,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ public class ScreenGame implements Screen {
 
     long timeEnemySpawn, timeEnemyInterval = 1500;
     long timeShotSpawn, timeShotInterval = 600;
+    long timeShipDestroy, timeShipAliveInterval = 6000;
 
     int kills;
 
@@ -83,18 +83,24 @@ public class ScreenGame implements Screen {
         }
 
         // вражеские корабли
-        spawnEnemy();
+        if(ship.isAlive){
+            spawnEnemy();
+        }
         for (int i = 0; i < enemy.size(); i++) {
             enemy.get(i).move();
             if(enemy.get(i).outOfScreen()) {
-                destroyShip();
+                if(ship.isAlive){
+                    destroyShip();
+                }
                 enemy.remove(i);
                 i--;
             }
         }
 
         // наши выстрелы
-        spawnShot();
+        if(ship.isAlive){
+            spawnShot();
+        }
         for (int i = 0; i < shots.size(); i++) {
             shots.get(i).move();
             if(shots.get(i).outOfScreen()) {
@@ -105,7 +111,7 @@ public class ScreenGame implements Screen {
             // попадание выстрела в вражеский корабль
             for (int j = 0; j < enemy.size(); j++) {
                 if(shots.get(i).overlap(enemy.get(j))) {
-                    spawnFragments(enemy.get(j).x, enemy.get(j).y, enemy.get(j).width);
+                    spawnFragments(enemy.get(j).x, enemy.get(j).y, enemy.get(j).width, 0);
                     enemy.remove(j);
                     shots.remove(i);
                     kills++;
@@ -126,7 +132,14 @@ public class ScreenGame implements Screen {
         }
 
         // наш космический корабль
-        ship.move();
+        if(ship.isAlive){
+            ship.move();
+        } else {
+            if(timeShipDestroy+timeShipAliveInterval<TimeUtils.millis()){
+                ship.isAlive = true;
+                ship.x = SCR_WIDTH/2;
+            }
+        }
 
         // +++++++++++++++ отрисовка всего +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         s.camera.update();
@@ -136,7 +149,7 @@ public class ScreenGame implements Screen {
             s.batch.draw(imgSky, skies[i].x, skies[i].y, skies[i].width, skies[i].height);
         }
         for (int i = 0; i < fragments.size(); i++) {
-            s.batch.draw(imgFragment[1][fragments.get(i).type],
+            s.batch.draw(imgFragment[fragments.get(i).typeShip][fragments.get(i).typeFragment],
                     fragments.get(i).getX(), fragments.get(i).getY(),
                     fragments.get(i).width/2, fragments.get(i).height/2,
                     fragments.get(i).width, fragments.get(i).height,
@@ -148,7 +161,9 @@ public class ScreenGame implements Screen {
         for (int i = 0; i < shots.size(); i++) {
             s.batch.draw(imgShot, shots.get(i).getX(), shots.get(i).getY(), shots.get(i).width, shots.get(i).height);
         }
-        s.batch.draw(imgShip, ship.getX(), ship.getY(), ship.width, ship.height);
+        if(ship.isAlive) {
+            s.batch.draw(imgShip, ship.getX(), ship.getY(), ship.width, ship.height);
+        }
         s.fontSmall.draw(s.batch, "KILLS: "+kills, 20, SCR_HEIGHT-20);
         s.batch.end();
     }
@@ -197,14 +212,16 @@ public class ScreenGame implements Screen {
         }
     }
 
-    void spawnFragments(float x, float y, float shipSize) {
+    void spawnFragments(float x, float y, float shipSize, int type) {
         for (int i = 0; i < 60; i++) {
-            fragments.add(new Fragment(x, y, shipSize));
+            fragments.add(new Fragment(x, y, shipSize, type));
         }
     }
 
     void destroyShip() {
-        spawnFragments(ship.x, ship.y, ship.width);
+        spawnFragments(ship.x, ship.y, ship.width, 1);
         if(s.sound) sndExplosion.play();
+        ship.isAlive = false;
+        timeShipDestroy = TimeUtils.millis();
     }
 }

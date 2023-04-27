@@ -3,8 +3,11 @@ package ru.myitschool.spaceshooter;
 import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
 
 public class SpaceShip extends SpaceObject{
+    boolean isAlive;
+
     public SpaceShip(float x, float y, float width, float height) {
         super(x, y, width, height);
+        isAlive = true;
     }
 
     @Override
