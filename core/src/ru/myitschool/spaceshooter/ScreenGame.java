@@ -5,6 +5,7 @@ import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,6 +28,8 @@ public class ScreenGame implements Screen {
     Sound sndShoot;
     Sound sndExplosion;
 
+    SpaceButton btnExit;
+
     Sky[] skies = new Sky[2];
     ArrayList<EnemyShip> enemy = new ArrayList<>();
     ArrayList<ShipShot> shots = new ArrayList<>();
@@ -39,6 +42,8 @@ public class ScreenGame implements Screen {
 
     int kills;
     boolean isGameOver;
+
+    Player[] players = new Player[6];
 
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
@@ -57,14 +62,21 @@ public class ScreenGame implements Screen {
         sndShoot = Gdx.audio.newSound(Gdx.files.internal("blaster.mp3"));
         sndExplosion = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
 
+        btnExit = new SpaceButton(s.fontSmall, "exit", SCR_WIDTH-100, 20);
+
+        for (int i = 0; i < players.length; i++) {
+            players[i] = new Player("Noname", 0);
+        }
+        loadTableOfRecords();
+
         skies[0] = new Sky(0);
         skies[1] = new Sky(SCR_HEIGHT);
-        ship = new SpaceShip(SCR_WIDTH/2, 100, 100, 100);
+
     }
 
     @Override
     public void show() {
-
+        gameStart();
     }
 
     @Override
@@ -74,7 +86,7 @@ public class ScreenGame implements Screen {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
             ship.vx = (s.touch.x - ship.x)/50;
-            if(isGameOver) {
+            if(btnExit.hit(s.touch.x, s.touch.y)) {
                 s.setScreen(s.screenIntro);
             }
         } else if(isAccelerometerPresent) { // проверяем наклон акселерометра
@@ -175,8 +187,13 @@ public class ScreenGame implements Screen {
             s.batch.draw(imgShip, SCR_WIDTH-40-40*i, SCR_HEIGHT-40, 30, 30);
         }
         s.fontSmall.draw(s.batch, "KILLS: "+kills, 20, SCR_HEIGHT-20);
+        btnExit.font.draw(s.batch, btnExit.text, btnExit.x, btnExit.y);
         if(isGameOver){
-            s.fontLarge.draw(s.batch, "GAME OVER", 0, SCR_HEIGHT/2, SCR_WIDTH, Align.center, false);
+            s.fontLarge.draw(s.batch, "GAME OVER", 0, SCR_HEIGHT/5*3, SCR_WIDTH, Align.center, false);
+            for (int i = 0; i < players.length; i++) {
+                String str = players[i].name + "......." + players[i].kills;
+                s.fontSmall.draw(s.batch, str, 0, SCR_HEIGHT/2-i*40, SCR_WIDTH, Align.center, true);
+            }
         }
         s.batch.end();
     }
@@ -237,8 +254,67 @@ public class ScreenGame implements Screen {
         ship.isAlive = false;
         ship.lives--;
         if(ship.lives == 0) {
-            isGameOver = true;
+            gameOver();
         }
         timeShipDestroy = TimeUtils.millis();
+    }
+
+    void gameOver() {
+        isGameOver = true;
+        players[players.length-1].name = s.playerName;
+        players[players.length-1].kills = kills;
+        sortTableOfRecords();
+        saveTableOfRecords();
+    }
+
+    void gameStart() {
+        isGameOver = false;
+        enemy.clear();
+        shots.clear();
+        fragments.clear();
+        kills = 0;
+        ship = new SpaceShip(SCR_WIDTH/2, 100, 100, 100);
+    }
+
+    void saveTableOfRecords(){
+        Preferences prefs = Gdx.app.getPreferences("Table Of Space Records");
+        for (int i = 0; i < players.length; i++) {
+            prefs.putString("name"+i, players[i].name);
+            prefs.putInteger("kills"+i, players[i].kills);
+        }
+        prefs.flush();
+    }
+
+    void loadTableOfRecords(){
+        Preferences prefs = Gdx.app.getPreferences("Table Of Space Records");
+        for (int i = 0; i < players.length; i++) {
+            if(prefs.contains("name"+i)) players[i].name = prefs.getString("name"+i);
+            if(prefs.contains("kills"+i)) players[i].kills = prefs.getInteger("kills"+i);
+        }
+    }
+
+    void sortTableOfRecords(){
+        for (int j = 0; j < players.length-1; j++) {
+            for (int i = 0; i < players.length-1; i++) {
+                if(players[i].kills<players[i+1].kills){
+                    int c = players[i].kills;
+                    players[i].kills = players[i+1].kills;
+                    players[i+1].kills = c;
+                    String s = players[i].name;
+                    players[i].name = players[i+1].name;
+                    players[i+1].name = s;
+					/* Player c = players[i];
+					players[i] = players[i+1];
+					players[i+1] = c; */
+                }
+            }
+        }
+    }
+
+    void clearTableOfRecords(){
+        for (int i = 0; i < players.length; i++) {
+            players[i].name = "Noname";
+            players[i].kills = 0;
+        }
     }
 }
