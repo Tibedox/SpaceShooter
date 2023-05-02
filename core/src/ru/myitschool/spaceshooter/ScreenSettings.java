@@ -77,6 +77,7 @@ public class ScreenSettings implements Screen {
                 }
                 if (btnClearRecords.hit(s.touch.x, s.touch.y)) {
                     btnClearRecords.setText("Records Pured");
+                    s.screenGame.clearTableOfRecords();
                 }
                 if (btnBack.hit(s.touch.x, s.touch.y)) {
                     s.setScreen(s.screenIntro);
