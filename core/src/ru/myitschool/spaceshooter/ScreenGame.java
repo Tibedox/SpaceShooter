@@ -1,5 +1,8 @@
 package ru.myitschool.spaceshooter;
 
+import static ru.myitschool.spaceshooter.SpaceShooter.MODE_EASY;
+import static ru.myitschool.spaceshooter.SpaceShooter.MODE_HARD;
+import static ru.myitschool.spaceshooter.SpaceShooter.MODE_NORMAL;
 import static ru.myitschool.spaceshooter.SpaceShooter.SCR_HEIGHT;
 import static ru.myitschool.spaceshooter.SpaceShooter.SCR_WIDTH;
 
@@ -16,65 +19,74 @@ import com.badlogic.gdx.utils.TimeUtils;
 import java.util.ArrayList;
 
 public class ScreenGame implements Screen {
-    SpaceShooter s;
-    boolean isAccelerometerPresent;
+    SpaceShooter s; // ссылка на объект главного класса игры
+    boolean isAccelerometerPresent; // флаг наличия акселерометра в телефоне
 
+    // текстуры
     Texture imgSky;
     Texture imgShip;
     Texture imgEnemy;
     Texture imgShot;
     Texture imgAtlasFragments;
     TextureRegion[][] imgFragment = new TextureRegion[2][4];
+    // звуки
     Sound sndShoot;
     Sound sndExplosion;
 
+    // кнопки
     SpaceButton btnExit;
 
+    // игровые объекты
     Sky[] skies = new Sky[2];
     ArrayList<EnemyShip> enemy = new ArrayList<>();
     ArrayList<ShipShot> shots = new ArrayList<>();
     ArrayList<Fragment> fragments = new ArrayList<>();
     SpaceShip ship;
+    Player[] players = new Player[6]; // игроки в таблице рекордов
 
-    long timeEnemySpawn, timeEnemyInterval = 1500;
+    // переменные для работы со таймером
+    long timeEnemySpawn, timeEnemyInterval;
     long timeShotSpawn, timeShotInterval = 600;
     long timeShipDestroy, timeShipAliveInterval = 6000;
 
-    int kills;
-    boolean isGameOver;
-
-    Player[] players = new Player[6];
+    int kills; // количество сбитых кораблей
+    boolean isGameOver; // флаг окончания игры
 
     public ScreenGame(SpaceShooter spaceShooter) {
         s = spaceShooter;
         // проверяем наличие акселерометра в устройстве
         isAccelerometerPresent = Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer);
 
+        // загружаем изображения
         imgSky = new Texture("stars.png");
         imgShip = new Texture("ship.png");
         imgEnemy = new Texture("enemy.png");
         imgShot = new Texture("shipshot.png");
         imgAtlasFragments = new Texture("atlasfragment.png");
+        // режем атлас изображений на текстуры
         for (int i = 0; i < imgFragment[0].length; i++) {
             imgFragment[0][i] = new TextureRegion(imgAtlasFragments, i*200, 0, 200, 200);
             imgFragment[1][i] = new TextureRegion(imgAtlasFragments, i*200, 200, 200, 200);
         }
+        // загружаем звуки
         sndShoot = Gdx.audio.newSound(Gdx.files.internal("blaster.mp3"));
         sndExplosion = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
 
+        // создаём кнопки
         btnExit = new SpaceButton(s.fontSmall, "exit", SCR_WIDTH-100, 20);
 
+        // создаём и загружаем таблицу рекордов
         for (int i = 0; i < players.length; i++) {
             players[i] = new Player("Noname", 0);
         }
         loadTableOfRecords();
 
+        // создаём объекты звёздного неба
         skies[0] = new Sky(0);
         skies[1] = new Sky(SCR_HEIGHT);
-
     }
 
-    @Override
+    @Override // срабатывает при переходе на этот screen
     public void show() {
         gameStart();
     }
@@ -86,6 +98,7 @@ public class ScreenGame implements Screen {
             s.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
             s.camera.unproject(s.touch);
             ship.vx = (s.touch.x - ship.x)/50;
+            //ship.vy = (s.touch.y - ship.y)/50;
             if(btnExit.hit(s.touch.x, s.touch.y)) {
                 s.setScreen(s.screenIntro);
             }
@@ -268,23 +281,34 @@ public class ScreenGame implements Screen {
     }
 
     void gameStart() {
-        isGameOver = false;
+        isGameOver = false; // выключаем флаг окончания игры
+        // удаляем все объекты на экране
         enemy.clear();
         shots.clear();
         fragments.clear();
-        kills = 0;
-        ship = new SpaceShip(SCR_WIDTH/2, 100, 100, 100);
+        kills = 0; // обнуляем фраги
+        ship = new SpaceShip(SCR_WIDTH/2, 100, 100, 100); // создаём объект космического корабля
+        // определяем интервал спауна врагов в зависимости от уровня игры
+        if(s.modeOfGame == MODE_EASY) {
+            timeEnemyInterval = 2000;
+        } else if(s.modeOfGame == MODE_NORMAL) {
+            timeEnemyInterval = 1200;
+        } else if(s.modeOfGame == MODE_HARD) {
+            timeEnemyInterval = 700;
+        }
     }
 
+    // сохраниение таблицы рекордов
     void saveTableOfRecords(){
         Preferences prefs = Gdx.app.getPreferences("Table Of Space Records");
         for (int i = 0; i < players.length; i++) {
             prefs.putString("name"+i, players[i].name);
             prefs.putInteger("kills"+i, players[i].kills);
         }
-        prefs.flush();
+        prefs.flush(); // записываем
     }
 
+    // считываем таблицу рекордов
     void loadTableOfRecords(){
         Preferences prefs = Gdx.app.getPreferences("Table Of Space Records");
         for (int i = 0; i < players.length; i++) {
@@ -293,10 +317,11 @@ public class ScreenGame implements Screen {
         }
     }
 
+    // сортируем таблицу рекордов
     void sortTableOfRecords(){
         for (int j = 0; j < players.length-1; j++) {
             for (int i = 0; i < players.length-1; i++) {
-                if(players[i].kills<players[i+1].kills){
+                if(players[i].kills < players[i+1].kills){ // по убыванию
                     int c = players[i].kills;
                     players[i].kills = players[i+1].kills;
                     players[i+1].kills = c;
@@ -311,6 +336,7 @@ public class ScreenGame implements Screen {
         }
     }
 
+    // очищаем таблицу рекордов
     void clearTableOfRecords(){
         for (int i = 0; i < players.length; i++) {
             players[i].name = "Noname";
